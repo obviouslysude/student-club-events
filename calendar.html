@@ -11,69 +11,54 @@
   <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.17/index.global.min.js'></script>
   <script>
     document.addEventListener('DOMContentLoaded', function () {
-    const calendarEl = document.getElementById('calendar');
-
-    
-    const eventsFromStorage = JSON.parse(localStorage.getItem('events')) || [];
-
-   
-    const formattedEvents = eventsFromStorage.map(event => ({
-      title: event.name + " @ " + event.place,
-      start: event.date
-    }));
-
-   
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-      initialView: 'dayGridMonth',
-      events: formattedEvents
-    });
-
-    calendar.render();
-  });
-
-    function logout() {
-      localStorage.setItem('isLoggedIn', 'false');
-      alert('Logged out successfully!');
-      window.location.href = 'login.html';
-    }
-
-   
-    function clearAllEvents() {
-      localStorage.removeItem('events');
-      alert('All events deleted!');
-      window.location.reload();
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
       const calendarEl = document.getElementById('calendar');
 
+      // Etkinlikleri localStorage'dan çek
       let eventsFromStorage = JSON.parse(localStorage.getItem('events')) || [];
 
-      
+      // Etkinlikleri formatla
       let formattedEvents = eventsFromStorage.map((event, index) => ({
-        id: index.toString(), 
+        id: index.toString(),
         title: event.name + " @ " + event.place,
         start: event.date
       }));
 
+      // Takvimi oluştur
       const calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         events: formattedEvents,
 
+        // Etkinliğe tıklanınca popup ile silme onayı
         eventClick: function(info) {
           if (confirm(`"${info.event.title}" etkinliğini silmek istiyor musun?`)) {
-            
-            eventsFromStorage.splice(parseInt(info.event.id), 1);
-            
-            localStorage.setItem('events', JSON.stringify(eventsFromStorage));
-            
-            info.event.remove();
-            alert("Etkinlik silindi.");
+            if (confirm("Emin misin?")) {
+              // LocalStorage'dan sil
+              eventsFromStorage.splice(parseInt(info.event.id), 1);
+              localStorage.setItem('events', JSON.stringify(eventsFromStorage));
+
+              // Takvimden sil
+              info.event.remove();
+              alert("Etkinlik silindi.");
+            }
           }
         }
       });
 
       calendar.render();
+
+      // Logout fonksiyonu
+      window.logout = function() {
+        localStorage.setItem('isLoggedIn', 'false');
+        alert('Başarıyla çıkış yapıldı!');
+        window.location.href = 'login.html';
+      }
+
+      // Tüm etkinlikleri sil
+      window.clearAllEvents = function() {
+        localStorage.removeItem('events');
+        alert('Tüm etkinlikler silindi!');
+        window.location.reload();
+      }
     });
   </script>
 
